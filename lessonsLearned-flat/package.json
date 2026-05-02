@@ -1,9 +1,0 @@
-{
-  "name": "vendorsync-360",
-  "version": "1.0.0",
-  "description": "Lessons Learned 2026 — VendorSync 360 etkinlik platformu",
-  "private": true,
-  "dependencies": {
-    "@vercel/kv": "^2.0.0"
-  }
-}
