@@ -5,10 +5,6 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { key } = req.query;
-    const expected = process.env.JURY_KEY || 'jury-2026';
-    if (key !== expected) return res.status(403).json({ error: 'Forbidden' });
-
     const teams = await kv.smembers('teams') || [];
     const sections = ['solution', 'plan', 'interventions'];
 

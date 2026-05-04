@@ -51,16 +51,17 @@ v1 ile aynı:
 1. **GitHub repo**: zip'i indir, `gzmilgar/vendorsync-360` repo'suna push et
 2. **Vercel deploy**: vercel.com'da new project → GitHub'dan import → deploy
 3. **Vercel KV ekle**: Storage tab → Create KV → bağla (env auto)
-4. **JURY_KEY**: Settings → Environment Variables → `JURY_KEY` = senin seçtiğin değer
-5. **Redeploy**
+4. **Redeploy**
 
 ## URL Yapısı
 
 Canlı deployment: **https://lessons-learned-seven.vercel.app**
 
 - [`/`](https://lessons-learned-seven.vercel.app/) — Ekip ekranı
-- [`/jury`](https://lessons-learned-seven.vercel.app/jury) — Jüri konsolu (anahtar ile, `JURY_KEY` env var Vercel'de tanımlı)
+- [`/jury`](https://lessons-learned-seven.vercel.app/jury) — Jüri konsolu (link'i bilen herkes açabilir, anahtar yok — etkinlik kapalı bir grupla yapıldığı için)
 - [`/survey`](https://lessons-learned-seven.vercel.app/survey) — Anonim anket (pre/post toggle)
+
+> **Güvenlik notu:** Jüri panelinde reset/skor/müdahale aksiyonları var. URL'i sadece jüri ekibiyle paylaş, sosyal medyada/public yerlerde paylaşma.
 
 ## Puanlama Mantığı
 

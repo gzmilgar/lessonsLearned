@@ -347,20 +347,8 @@
   </div>
 </header>
 
-<!-- SETUP -->
-<div class="container" id="setupView">
-  <div class="setup-card">
-    <h2>Jüri Anahtarı</h2>
-    <p style="font-size:13px;color:var(--ink-dim);margin-bottom:18px;line-height:1.5">
-      Bu sayfaya sadece jüri girer. JURY_KEY anahtarını gir.
-    </p>
-    <input type="password" id="keyInput" placeholder="anahtar..." autocomplete="off" />
-    <button class="btn" onclick="setKey()">Aç</button>
-  </div>
-</div>
-
 <!-- ANA PANEL -->
-<div id="mainView" style="display:none">
+<div id="mainView">
   <div class="container">
     <section class="hero">
       <div class="eyebrow">Lessons Learned 2026 · v2 · Master Console</div>
@@ -436,34 +424,17 @@
 </div>
 
 <script>
-  let JURY_KEY = null;
   let currentData = null;
   let selectedTeam = null;
   let pollInterval = null;
   let surveyPhase = 'pre';
 
-  const stored = localStorage.getItem('vs360_jury_key');
-  if (stored) { JURY_KEY = stored; tryShowMain(); }
+  // Açılışta direkt yüklenir — anahtar yok, panel açık.
+  loadJury().then(() => {
+    renderDeck();
+    startPolling();
+  });
 
-  function setKey() {
-    const k = document.getElementById('keyInput').value.trim();
-    if (!k) return;
-    JURY_KEY = k;
-    tryShowMain();
-  }
-  async function tryShowMain() {
-    const ok = await loadJury();
-    if (ok) {
-      localStorage.setItem('vs360_jury_key', JURY_KEY);
-      document.getElementById('setupView').style.display = 'none';
-      document.getElementById('mainView').style.display = 'block';
-      renderDeck();
-      startPolling();
-    } else {
-      JURY_KEY = null;
-      alert('Anahtar yanlış.');
-    }
-  }
   function startPolling() {
     if (pollInterval) clearInterval(pollInterval);
     pollInterval = setInterval(loadJury, 4000);
@@ -550,7 +521,7 @@
     await fetch('/api/intervention', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: JURY_KEY, action: 'set', card })
+      body: JSON.stringify({ action: 'set', card })
     });
     loadJury();
   }
@@ -558,7 +529,7 @@
     await fetch('/api/intervention', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: JURY_KEY, action: 'clear' })
+      body: JSON.stringify({ action: 'clear' })
     });
     loadJury();
   }
@@ -566,7 +537,7 @@
     await fetch('/api/intervention', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: JURY_KEY, action: 'present', team })
+      body: JSON.stringify({ action: 'present', team })
     });
     loadJury();
   }
@@ -576,7 +547,7 @@
     await fetch('/api/intervention', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: JURY_KEY, action: 'reset' })
+      body: JSON.stringify({ action: 'reset' })
     });
     selectedTeam = null;
     loadJury();
@@ -585,7 +556,7 @@
     await fetch('/api/intervention', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: JURY_KEY, action: 'score', team, field, value: parseFloat(value) || 0 })
+      body: JSON.stringify({ action: 'score', team, field, value: parseFloat(value) || 0 })
     });
   }
 
@@ -601,9 +572,8 @@
   }
 
   async function loadJury() {
-    if (!JURY_KEY) return false;
     try {
-      const res = await fetch('/api/jury?key=' + encodeURIComponent(JURY_KEY));
+      const res = await fetch('/api/jury');
       if (!res.ok) return false;
       const data = await res.json();
       currentData = data;

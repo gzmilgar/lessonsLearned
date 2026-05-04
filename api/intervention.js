@@ -5,9 +5,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { key, action, card } = req.body || {};
-    const expected = process.env.JURY_KEY || 'jury-2026';
-    if (key !== expected) return res.status(403).json({ error: 'Forbidden' });
+    const { action, card } = req.body || {};
 
     if (action === 'set') {
       if (!card) return res.status(400).json({ error: 'Missing card' });
