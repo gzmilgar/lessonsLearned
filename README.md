@@ -8,7 +8,7 @@
 - **AI-Powered yaklaşım** (Document AI sınırından çıkış) — senaryoda OCR yanında duplicate kontrol, risk skor, GenAI asistan, eksik bilgi tespiti, süreç optimizasyonu
 - **AI Sınırları** (Responsible AI prensipleri) — pazarlık edilemez kurallar olarak senaryoda
 - **Rol kartları "yanlış algı tuzağı + beklenen davranış"** formatında — artık ekipler sadece "rol almıyor", o rolün ne anlama geldiğini öğreniyor
-- **6 rol kartı** (4 ana + Modülcü + Basis peripheral)
+- **5 rol kartı** (4 ana + Basis peripheral). Modül Danışmanı, Müşteri ve PY/Governor ekip rolü değildir — bu üçü jüri tarafında ve sunum sırasında dışarıdan müdahale eder.
 - **Psikolojik güvenlik banner'ı** — açılışta "kişiler değil, davranışlar gözleniyor" mesajı
 - **Müdahale destesi 15 → 21 kart** (yeni: AI mı kural motoru mu, AI yanlış duplicate, MDG bypass, senior bağımlılığı, junior'ın sesi, operasyon sahipliği, KVKK riski, tam otomasyon)
 - **Yeni form alanları**: AI Sınırı (S4), Operasyon & Support (P4), Veri Yerleşimi & KVKK ayrı alan
@@ -80,10 +80,12 @@ v1 ile aynı:
 
 ## Müdahale Destesi (21 kart)
 
-| Şapka | Kart Sayısı |
+Bu şapkaların **hepsi jüri tarafındadır** — ekip içinde bu rolleri kimse oynamaz. Sunum sırasında jüri kart seçer, ekibin ekranını kaplayan müdahaleyi başlatır.
+
+| Şapka (jüri tarafı) | Kart Sayısı |
 |---|---|
 | Müşteri (Serkan) | 4 |
-| Modülcü / Data Gov. (Gizem) | 5 |
+| Modül Danışmanı / Data Gov. (Gizem) | 5 |
 | Solution Governance | 2 |
 | PY/Governor (Başak) | 4 |
 | Basis / AMS (Kaan) | 3 |
