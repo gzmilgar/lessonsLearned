@@ -41,7 +41,10 @@ api/
 ├── state.js         Ekip durumu (3 sn polling)
 ├── intervention.js  Jüri: müdahale, sunum reveal, skor, reset
 ├── jury.js          Tüm ekiplerin verileri + anket sonuçları
-└── survey.js        Anonim anket cevap toplama
+├── survey.js        Anonim anket cevap toplama
+├── export-sheets.js Tüm veriyi Google Sheets'e push'la (arşiv)
+└── _lib/
+    └── loadAll.js   Paylaşımlı KV okuyucu (jury + export-sheets)
 ```
 
 ## Kurulum
@@ -62,6 +65,75 @@ Canlı deployment: **https://lessons-learned-seven.vercel.app**
 - [`/survey`](https://lessons-learned-seven.vercel.app/survey) — Anonim anket (pre/post toggle)
 
 > **Güvenlik notu:** Jüri panelinde reset/skor/müdahale aksiyonları var. URL'i sadece jüri ekibiyle paylaş, sosyal medyada/public yerlerde paylaşma.
+
+## Google Sheets Arşivi
+
+Etkinlik bitiminde (veya istediğin an) tüm veriyi tek bir Google Sheet'e push'lamak için jüri panelindeki **"Google Sheets'e Aktar"** butonu kullanılır. Bir kerelik kurulum:
+
+### Kurulum (tek seferlik)
+
+1. **Boş bir Google Sheet oluştur** (ör. "VendorSync 360 Archive"). İçeriği önemli değil — script tabları kendi açar.
+2. **Extensions → Apps Script**. Açılan editörde `Code.gs` içeriğini sil, aşağıdaki snippet'i yapıştır, **disket ikonu / Ctrl+S** ile kaydet:
+   ```javascript
+   function doPost(e) {
+     const body = JSON.parse(e.postData.contents);
+     const ss = SpreadsheetApp.getActive();
+     const written = {};
+     Object.entries(body.tabs).forEach(([name, rows]) => {
+       const headers = (body.headers && body.headers[name]) || [];
+       let sheet = ss.getSheetByName(name) || ss.insertSheet(name);
+       if (body.mode === 'append') {
+         if (sheet.getLastRow() === 0 && headers.length) {
+           sheet.appendRow(headers);
+           sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+         }
+         rows.forEach(r => sheet.appendRow(r));
+       } else {
+         sheet.clear();
+         if (headers.length) {
+           sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
+         }
+         if (rows.length) {
+           sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
+         }
+       }
+       written[name] = rows.length;
+     });
+     return ContentService
+       .createTextOutput(JSON.stringify({ ok: true, written }))
+       .setMimeType(ContentService.MimeType.JSON);
+   }
+   ```
+3. **Deploy → New deployment** → Type: **Web app**. Ayarlar:
+   - **Execute as:** Me (kendi hesabın)
+   - **Who has access:** Anyone
+   - Deploy → Google izinlerini onayla → çıkan **Web App URL'ini kopyala** (`https://script.google.com/macros/s/.../exec`).
+4. **Vercel → Project Settings → Environment Variables** → ekle:
+   - Name: `SHEETS_WEBHOOK_URL`
+   - Value: kopyaladığın Apps Script URL'i
+   - Scope: Production (istersen Preview de)
+5. **Redeploy** (Vercel → Deployments → en son deployment yanındaki ⋯ → Redeploy).
+
+### Kullanım
+
+Jüri panelinde **"⤴ Google Sheets'e Aktar"** butonuna bas → onayla → 1-2 saniye sonra Sheet 6 tab ile dolar:
+
+| Tab | Ne tutar |
+|---|---|
+| `Teams_Answers` | Ekip form cevapları (her satır: ekip / bölüm / alan / değer / kilit) |
+| `Intervention_Responses` | Ekiplerin müdahalelere verdiği tepkiler |
+| `Scores` | Jüri skorları (her satır: ekip / kategori / puan) |
+| `Surveys` | Anonim anket cevapları (pre + post tek tabda, `phase` kolonu ile) |
+| `Intervention_Log` | Jüri'nin attığı müdahale kartları (zaman damgalı) |
+| `Meta` | Export anı, ekip sayısı, anket sayısı vb. özet |
+
+**Önemli:** Mode default `replace` — her aktarım Sheet'teki o tab'ı temizleyip baştan yazar. KV zaten source of truth, veri kaybı yok. Birden fazla kez basabilirsin (etkinlik içinde "ara snapshot" + sonunda "final snapshot").
+
+### Sorun giderme
+
+- **"SHEETS_WEBHOOK_URL not configured"** → Vercel'de env var yok ya da redeploy yapılmadı.
+- **"Apps Script webhook returned 401/403"** → Apps Script "Who has access" ayarı "Anyone" değil; deploy'u yeniden yap.
+- **URL değişti** → Apps Script'te kod güncelleyip yeni "deployment" yaptıysan URL değişir. Stable URL için: **Manage deployments → Edit (kalem) → New version** seç (yeni deployment değil).
 
 ## Puanlama Mantığı
 

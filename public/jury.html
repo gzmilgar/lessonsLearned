@@ -374,6 +374,7 @@
             <button class="btn ghost small" onclick="loadJury()">↻ Yenile</button>
             <button class="btn ghost small" onclick="setPresenting(null)">Sunum Reveal'ını Kapat</button>
             <button class="btn ghost small" onclick="exportData()">⤓ JSON Export</button>
+            <button class="btn ghost small" onclick="exportToSheets(this)">⤴ Google Sheets'e Aktar</button>
             <button class="btn danger small" onclick="resetAll()">⚠ Tümünü Sıfırla</button>
           </div>
         </aside>
@@ -569,6 +570,31 @@
     a.download = `vendorsync-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function exportToSheets(btn) {
+    if (!confirm('Tüm veriyi Google Sheets\'e yazacak (mevcut tabları temizler). Devam?')) return;
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Aktarılıyor...';
+    try {
+      const r = await fetch('/api/export-sheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'replace' })
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status));
+      const lines = Object.entries(j.written || {})
+        .map(([tab, n]) => `  ${tab}: ${n} satır`)
+        .join('\n');
+      alert('✓ Google Sheets güncellendi.\n\nYazılan:\n' + lines);
+    } catch (e) {
+      alert('✗ Aktarım başarısız: ' + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
   }
 
   async function loadJury() {
