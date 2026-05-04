@@ -56,9 +56,11 @@ v1 ile aynı:
 
 ## URL Yapısı
 
-- `/` — Ekip ekranı
-- `/jury` — Jüri konsolu (anahtar ile)
-- `/survey` — Anonim anket (pre/post toggle)
+Canlı deployment: **https://lessons-learned-seven.vercel.app**
+
+- [`/`](https://lessons-learned-seven.vercel.app/) — Ekip ekranı
+- [`/jury`](https://lessons-learned-seven.vercel.app/jury) — Jüri konsolu (anahtar ile, `JURY_KEY` env var Vercel'de tanımlı)
+- [`/survey`](https://lessons-learned-seven.vercel.app/survey) — Anonim anket (pre/post toggle)
 
 ## Puanlama Mantığı
 
